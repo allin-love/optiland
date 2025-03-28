@@ -1,14 +1,12 @@
 from abc import ABC
 
 
-class RayAimer(ABC):
-
+class RayAimer(ABC):  # noqa: B024
     def __init__(self, optic):
         raise NotImplementedError
 
 
 class BisectionRayAimer(RayAimer):
-
     def __init__(self, optic):
         super().__init__(optic)
 
@@ -17,7 +15,6 @@ class BisectionRayAimer(RayAimer):
 
 
 class NewtonRayAimer(RayAimer):
-
     def __init__(self, optic):
         super().__init__(optic)
 
@@ -26,10 +23,9 @@ class NewtonRayAimer(RayAimer):
 
 
 class RayAimerFactory:
-
     @staticmethod
     def create(aiming_type, optic):
-        if aiming_type == 'bisection':
+        if aiming_type == "bisection":
             return BisectionRayAimer(optic)
         else:
-            raise ValueError('Invalid aiming type: {}'.format(aiming_type))
+            raise ValueError(f"Invalid aiming type: {aiming_type}")

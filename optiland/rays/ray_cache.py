@@ -2,7 +2,6 @@ from collections import OrderedDict
 
 
 class RayCache:
-
     def __init__(self, cache_size=100):
         self.cache_size = cache_size
         self.cache = OrderedDict()

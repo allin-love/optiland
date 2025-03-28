@@ -6,14 +6,16 @@ for tracing through an optical system.
 Kramer Harrison, 2024
 """
 
-from abc import ABC, abstractmethod
-import pickle
 import hashlib
+import pickle
+from abc import ABC, abstractmethod
+
 import numpy as np
-from optiland.rays.real_rays import RealRays
+
 from optiland.rays.polarized_rays import PolarizedRays
-from optiland.rays.ray_cache import RayCache
 from optiland.rays.ray_aiming import RayAimerFactory
+from optiland.rays.ray_cache import RayCache
+from optiland.rays.real_rays import RealRays
 
 
 def get_ray_starting_z_offset(optic, EPD=None):
@@ -33,10 +35,7 @@ def get_ray_starting_z_offset(optic, EPD=None):
         float: The z-coordinate offset relative to the first surface.
     """
     z = optic.surface_group.positions[1:-1]
-    if EPD is None:
-        offset = optic.paraxial.EPD()
-    else:
-        offset = EPD
+    offset = optic.paraxial.EPD() if EPD is None else EPD
     return offset - np.min(z)
 
 
@@ -110,13 +109,11 @@ def get_ray_origins_infinite(optic, field, pupil, vx, vy):
 
 
 class FieldCalculator(ABC):
-
     def __init__(self, optic):
         self.optic = optic
 
     def generate_rays(self, Hx, Hy, Px, Py, wavelength):
-        """
-        Generates rays for tracing based on the given parameters.
+        """Generates rays for tracing based on the given parameters.
 
         Args:
             Hx (float): Normalized x field coordinate.
@@ -127,6 +124,7 @@ class FieldCalculator(ABC):
 
         Returns:
             RealRays: RealRays object containing the generated rays.
+
         """
         self._validate()
 
@@ -136,13 +134,15 @@ class FieldCalculator(ABC):
         if self.optic.obj_space_telecentric:
             ap_type = self.optic.aperture.ap_type
 
-            if ap_type == 'objectNA':
+            if ap_type == "objectNA":
                 sin = self.optic.aperture.value
-            elif ap_type == 'object_cone_angle':
+            elif ap_type == "object_cone_angle":
                 sin = np.sin(np.radians(self.optic.aperture.value))
             else:
-                raise ValueError(f'Aperture type {ap_type} may not be used '
-                                 'with telecentric object space.')
+                raise ValueError(
+                    f"Aperture type {ap_type} may not be used "
+                    "with telecentric object space."
+                )
 
             z = np.sqrt(1 - sin**2) / sin + z0
             z1 = np.full_like(Px, z)
@@ -201,7 +201,7 @@ class FieldCalculator(ABC):
         Returns:
             RealRays or PolarizedRays: The appropriate ray instance.
         """
-        mag = np.sqrt((x1 - x0)**2 + (y1 - y0)**2 + (z1 - z0)**2)
+        mag = np.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
         L = (x1 - x0) / mag
         M = (y1 - y0) / mag
         N = (z1 - z0) / mag
@@ -213,17 +213,18 @@ class FieldCalculator(ABC):
         intensity = np.ones_like(x1)
         wavelength = np.ones_like(x1) * wavelength
 
-        if self.optic.polarization == 'ignore':
+        if self.optic.polarization == "ignore":
             if self.optic.surface_group.uses_polarization:
-                raise ValueError('Polarization must be set when surfaces have '
-                                 'polarization-dependent coatings.')
+                raise ValueError(
+                    "Polarization must be set when surfaces have "
+                    "polarization-dependent coatings.",
+                )
             return RealRays(x0, y0, z0, L, M, N, intensity, wavelength)
         else:
             return PolarizedRays(x0, y0, z0, L, M, N, intensity, wavelength)
 
 
 class AngleFieldCalculator(FieldCalculator):
-
     def __init__(self, optic):
         super().__init__(optic)
 
@@ -268,12 +269,12 @@ class AngleFieldCalculator(FieldCalculator):
 
     def _validate(self):
         if self.optic.obj_space_telecentric:
-            raise ValueError('Object space cannot be telecentric for a '
-                             'field type of "angle".')
+            raise ValueError(
+                'Object space cannot be telecentric for a field type of "angle".'
+            )
 
 
 class ObjectHeightFieldCalculator(FieldCalculator):
-
     def __init__(self, optic):
         super().__init__(optic)
 
@@ -302,19 +303,20 @@ class ObjectHeightFieldCalculator(FieldCalculator):
         # Check if the object space is infinite
         infinite = self.optic.object_surface.is_infinite
         if infinite:
-            raise ValueError('Object space cannot be infinite for a '
-                             'field type of "object_height".')
+            raise ValueError(
+                'Object space cannot be infinite for a field type of "object_height".'
+            )
 
         # Object space cannot be telecentric for EPD or imageFNO apertures
         telecentric = self.optic.obj_space_telecentric
         ap_type = self.optic.aperture.ap_type
-        if telecentric and ap_type in ['EPD', 'imageFNO']:
-            raise ValueError(f'Aperture type cannot be "{ap_type}" for'
-                             ' telecentric object space.')
+        if telecentric and ap_type in ["EPD", "imageFNO"]:
+            raise ValueError(
+                f'Aperture type cannot be "{ap_type}" for telecentric object space.'
+            )
 
 
 class ParaxialImageHeightFieldCalculator(FieldCalculator):
-
     def __init__(self, optic):
         super().__init__(optic)
 
@@ -382,21 +384,19 @@ class ParaxialImageHeightFieldCalculator(FieldCalculator):
 
 
 class FieldCalculatorFactory:
-
     @staticmethod
     def create(optic):
-        if optic.field_type == 'angle':
+        if optic.field_type == "angle":
             return AngleFieldCalculator(optic)
-        elif optic.field_type == 'object_height':
+        elif optic.field_type == "object_height":
             return ObjectHeightFieldCalculator(optic)
-        elif optic.field_type == 'paraxial_image_height':
+        elif optic.field_type == "paraxial_image_height":
             return ParaxialImageHeightFieldCalculator(optic)
         else:
-            raise ValueError('Invalid field type: {}'.format(optic.field_type))
+            raise ValueError(f"Invalid field type: {optic.field_type}")
 
 
 class RayGenerator:
-
     def __init__(self, optic):
         self.optic = optic
         self.aiming_type = None
@@ -421,7 +421,8 @@ class RayGenerator:
             # If the initial rays are not found, generate new rays
             if not initial_rays:
                 initial_rays = self.field_calculator.generate_rays(
-                    Hx, Hy, Px, Py, wavelength)
+                    Hx, Hy, Px, Py, wavelength
+                )
 
             # Generate the final rays
             rays = self.ray_aimer.generate_rays(Hx, Hy, Px, Py, initial_rays)
@@ -430,8 +431,7 @@ class RayGenerator:
             self.cache.add_rays(key, rays)
 
         else:
-            rays = self.field_calculator.generate_rays(
-                Hx, Hy, Px, Py, wavelength)
+            rays = self.field_calculator.generate_rays(Hx, Hy, Px, Py, wavelength)
 
         return rays
 
