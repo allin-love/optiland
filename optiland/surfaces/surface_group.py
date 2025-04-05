@@ -191,17 +191,27 @@ class SurfaceGroup:
         t = self.positions
         return t[surface_number + 1] - t[surface_number]
 
-    def trace(self, rays, skip=0):
+    def trace(self, rays, skip=0, sequence_order=None):
         """Trace the given rays through the surfaces.
 
         Args:
             rays (BaseRays): List of rays to be traced.
             skip (int, optional): Number of surfaces to skip before tracing.
                 Defaults to 0.
-
+            sequence_order (list, optional): list of the surface indices
+                defining the ray tracing order. If None, then the order defaults
+                to the order of surfaces in the group.
         """
+        if sequence_order is None:
+            surfaces = self.surfaces
+        else:
+            try:
+                surfaces = [self.surfaces[i] for i in sequence_order]
+            except IndexError as err:
+                raise IndexError("Invalid surface index requested.") from err
+
         self.reset()
-        for surface in self.surfaces[skip:]:
+        for surface in surfaces[skip:]:
             surface.trace(rays)
         return rays
 
