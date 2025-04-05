@@ -18,8 +18,9 @@ class ParaxialRayTracer:
         optic (Optic): The optical system to be traced.
     """
 
-    def __init__(self, optic):
+    def __init__(self, optic, sequence_order=None):
         self.optic = optic
+        self.sequence_order = sequence_order
 
     def trace(self, Hy, Py, wavelength):
         """Trace paraxial ray through the optical system based on specified field
