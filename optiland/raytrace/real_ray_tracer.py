@@ -27,7 +27,15 @@ class RealRayTracer:
         self.optic = optic
         self.ray_generator = RayGenerator(optic)
 
-    def trace(self, Hx, Hy, wavelength, num_rays=100, distribution="hexapolar"):
+    def trace(
+        self,
+        Hx,
+        Hy,
+        wavelength,
+        num_rays=100,
+        distribution="hexapolar",
+        sequence_order=None,
+    ):
         """Trace a distribution of rays through the optical system.
 
         Args:
@@ -38,6 +46,8 @@ class RealRayTracer:
                 to 100.
             distribution (str or Distribution, optional): The distribution of
                 the rays. Defaults to 'hexapolar'.
+            sequence_order (list): A list of indices to select (and order) surfaces for
+                ray tracing.
 
         Returns:
             RealRays: The RealRays object containing the traced rays."
@@ -51,7 +61,7 @@ class RealRayTracer:
         Py = distribution.y
 
         rays = self.ray_generator.generate_rays(Hx, Hy, Px, Py, wavelength)
-        self.optic.surface_group.trace(rays)
+        self.optic.surface_group.trace(rays, sequence_order=sequence_order)
 
         if isinstance(rays, PolarizedRays):
             rays.update_intensity(self.optic.polarization_state)
@@ -61,7 +71,7 @@ class RealRayTracer:
 
         return rays
 
-    def trace_generic(self, Hx, Hy, Px, Py, wavelength):
+    def trace_generic(self, Hx, Hy, Px, Py, wavelength, sequence_order=None):
         """Trace generic rays through the optical system.
 
         Args:
@@ -70,6 +80,8 @@ class RealRayTracer:
             Px (float or numpy.ndarray): The normalized x pupil coordinate.
             Py (float or numpy.ndarray): The normalized y pupil coordinate
             wavelength (float): The wavelength of the rays.
+            sequence_order (list): A list of indices to select (and order) surfaces for
+                ray tracing.
 
         """
         self._validate_normalized_coordinates(Hx, Hy, "field")
@@ -84,7 +96,7 @@ class RealRayTracer:
         Hx, Hy, Px, Py = self._validate_array_size(Hx, Hy, Px, Py)
 
         rays = self.ray_generator.generate_rays(Hx, Hy, Px, Py, wavelength)
-        rays = self.optic.surface_group.trace(rays)
+        rays = self.optic.surface_group.trace(rays, sequence_order=sequence_order)
 
         # update intensity
         self.optic.surface_group.intensity[-1, :] = rays.i
