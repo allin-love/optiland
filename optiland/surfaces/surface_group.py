@@ -40,6 +40,7 @@ class SurfaceGroup:
             self.surfaces = surfaces
 
         self.surface_factory = SurfaceFactory(self)
+        self.relative_thicknesses = []
 
     def __add__(self, other):
         """Add two SurfaceGroup objects together.
@@ -274,6 +275,40 @@ class SurfaceGroup:
         if index == 0:
             raise ValueError("Cannot remove object surface.")
         del self.surfaces[index]
+
+    def update_coordinates_from(self, start_index: int):
+        """
+        Updates the coordinate systems of surfaces starting from `start_index`.
+
+        Args:
+            start_index (int): The index from which to begin updating z positions.
+
+        Raises:
+            ValueError: If the relative_thicknesses list has a different length than
+                the number of surfaces.
+        """
+        if len(self.relative_thicknesses) != len(self.surfaces):
+            raise ValueError(
+                "Mismatch between number of surfaces and stored thicknesses."
+            )
+
+        # Ensure index 1 is pinned at z = 0
+        if len(self.surfaces) > 1:
+            self.surfaces[1].cs.z = 0.0
+
+        # Initialize z-position based on surface 1 (or 0 if necessary)
+        z = (
+            self.surfaces[1].cs.z
+            if start_index <= 1
+            else self.surfaces[start_index - 1].cs.z
+        )
+
+        for i in range(max(start_index, 2), len(self.surfaces)):
+            thickness = self.relative_thicknesses[i]
+            z += thickness
+
+            cs = self.surfaces[i].geometry.cs
+            cs.z = z
 
     def reset(self):
         """Resets all the surfaces in the collection.
