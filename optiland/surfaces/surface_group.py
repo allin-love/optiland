@@ -257,7 +257,8 @@ class SurfaceGroup:
 
         self.surfaces.insert(index, new_surface)
 
-        self.surface_factory.last_thickness = kwargs.get("thickness", 0)
+        # Recalculate z positions from this surface onward
+        self.update_coordinates_from(index)
 
     def remove_surface(self, index):
         """Remove a surface from the list of surfaces.
