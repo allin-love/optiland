@@ -72,6 +72,9 @@ class SurfaceFactory:
             index, self._surface_group, **kwargs
         )
 
+        if not self.use_absolute_cs:
+            self._store_relative_thickness(index, kwargs.get("thickness"))
+
         # Build pre and post surface materials
         material_pre, material_post = self._material_factory.create(
             index, material, self._surface_group
@@ -133,3 +136,20 @@ class SurfaceFactory:
             comment=comment,
             **common_params,
         )
+
+    def _store_relative_thickness(self, index, thickness):
+        """Helper method to store the relative thickness for each surface.
+
+        Args:
+            index (int): The index at which the surface is inserted.
+            thickness (float): The relative thickness of the surface.
+        """
+        rel_thick = self._surface_group.relative_thicknesses
+        # Update or append the thickness value at the corresponding index.
+        if index < len(rel_thick):
+            rel_thick[index] = thickness
+        else:
+            # Fill any gaps with default values (0) if necessary.
+            while len(rel_thick) < index:
+                rel_thick.append(0)
+            rel_thick.append(thickness)
