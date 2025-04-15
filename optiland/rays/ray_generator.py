@@ -6,8 +6,7 @@ for tracing through an optical system.
 Kramer Harrison, 2024
 """
 
-import numpy as np
-
+import optiland.backend as be
 from optiland.rays.polarized_rays import PolarizedRays
 from optiland.rays.real_rays import RealRays
 
@@ -33,9 +32,9 @@ class RayGenerator:
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate(s) of the pupil point(s).
-            Py (float or np.ndarray): y-coordinate(s) of the pupil point(s).
-            wavelength (float): Wavelength for the generated rays.
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
+            wavelength (float): Wavelength of the rays.
 
         Returns:
             RealRays or PolarizedRays: An object containing the generated rays.
@@ -44,8 +43,7 @@ class RayGenerator:
             ValueError: If the optic configuration is inconsistent (e.g.,
                 using an "angle" field type in a telecentric object space).
         """
-        # Calculate vignetting factors.
-        vx, vy = 1 - np.array(self.optic.fields.get_vig_factor(Hx, Hy))
+        vx, vy = 1 - be.array(self.optic.fields.get_vig_factor(Hx, Hy))
         x0, y0, z0 = self._get_ray_origins(Hx, Hy, Px, Py, vx, vy)
 
         # Determine terminal ray coordinates based on object space configuration.
@@ -53,8 +51,8 @@ class RayGenerator:
             self._validate_telecentric_conditions()
             sin_value = self.optic.aperture.value
             # Compute effective z-coordinate.
-            z_terminal = np.sqrt(1 - sin_value**2) / sin_value + z0
-            z1 = np.full_like(Px, z_terminal)
+            z_terminal = be.sqrt(1 - sin_value**2) / sin_value + z0
+            z1 = be.full_like(Px, z_terminal)
             x1 = Px * vx + x0
             y1 = Py * vy + y0
         else:
@@ -62,18 +60,18 @@ class RayGenerator:
             EPD = self.optic.paraxial.EPD()
             x1 = Px * EPD * vx / 2
             y1 = Py * EPD * vy / 2
-            z1 = np.full_like(Px, EPL)
+            z1 = be.full_like(Px, EPL)
 
         # Calculate direction cosines.
         L, M, N = self._compute_direction_cosines(x0, y0, z0, x1, y1, z1)
 
         # Ensure origins are in array form.
-        x0 = np.full_like(x1, x0)
-        y0 = np.full_like(x1, y0)
-        z0 = np.full_like(x1, z0)
+        x0 = be.full_like(x1, x0)
+        y0 = be.full_like(x1, y0)
+        z0 = be.full_like(x1, z0)
 
-        intensity = np.ones_like(x1)
-        wavelength_arr = np.full_like(x1, wavelength)
+        intensity = be.ones_like(x1)
+        wavelength_arr = be.full_like(x1, wavelength)
 
         if self.optic.polarization == "ignore":
             if self.optic.surface_group.uses_polarization:
@@ -116,7 +114,7 @@ class RayGenerator:
         delta_x = x1 - x0
         delta_y = y1 - y0
         delta_z = z1 - z0
-        mag = np.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
+        mag = be.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
         L = delta_x / mag
         M = delta_y / mag
         N = delta_z / mag
@@ -132,8 +130,8 @@ class RayGenerator:
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate(s) of the pupil point(s).
-            Py (float or np.ndarray): y-coordinate(s) of the pupil point(s).
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
             vx (float): Vignetting factor in the x-direction.
             vy (float): Vignetting factor in the y-direction.
 
@@ -163,14 +161,14 @@ class RayGenerator:
             EPD = self.optic.paraxial.EPD()
             offset = self._get_starting_z_offset()
 
-            # Compute the object ray base positions.
-            x_base = -np.tan(np.radians(field_x)) * (offset + EPL)
-            y_base = -np.tan(np.radians(field_y)) * (offset + EPL)
-            z_val = self.optic.surface_group.positions[1] - offset
+            # x, y, z positions of ray starting points
+            x = -be.tan(be.radians(field_x)) * (offset + EPL)
+            y = -be.tan(be.radians(field_y)) * (offset + EPL)
+            z = self.optic.surface_group.positions[1] - offset
 
-            x0 = Px * (EPD / 2) * vx + x_base
-            y0 = Py * (EPD / 2) * vy + y_base
-            z0 = np.full_like(Px, z_val)
+            x0 = Px * EPD / 2 * vx + x
+            y0 = Py * EPD / 2 * vy + y
+            z0 = be.full_like(Px, z)
         else:
             if self.optic.field_type == "object_height":
                 x_base = field_x
@@ -180,14 +178,14 @@ class RayGenerator:
             elif self.optic.field_type == "angle":
                 EPL = self.optic.paraxial.EPL()
                 z_val = self.optic.surface_group.positions[0]
-                x_base = -np.tan(np.radians(field_x)) * (EPL - z_val)
-                y_base = -np.tan(np.radians(field_y)) * (EPL - z_val)
+                x_base = -be.tan(be.radians(field_x)) * (EPL - z_val)
+                y_base = -be.tan(be.radians(field_y)) * (EPL - z_val)
             else:
                 raise ValueError(f"Unsupported field type: {self.optic.field_type}")
 
-            x0 = np.full_like(Px, x_base)
-            y0 = np.full_like(Px, y_base)
-            z0 = np.full_like(Px, z_val)
+            x0 = be.full_like(Px, x_base)
+            y0 = be.full_like(Px, y_base)
+            z0 = be.full_like(Px, z_val)
 
         return x0, y0, z0
 
@@ -200,7 +198,6 @@ class RayGenerator:
         Returns:
             float: The z-coordinate offset relative to the first surface.
         """
-        # Exclude the first and last surface positions.
-        surface_positions = self.optic.surface_group.positions[1:-1]
-        EPD = self.optic.paraxial.EPD()
-        return EPD - np.min(surface_positions)
+        z = self.optic.surface_group.positions[1:-1]
+        offset = self.optic.paraxial.EPD()
+        return offset - be.min(z)
