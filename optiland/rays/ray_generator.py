@@ -10,8 +10,7 @@ import hashlib
 import pickle
 from abc import ABC, abstractmethod
 
-import numpy as np
-
+import optiland.backend as be
 from optiland.rays.polarized_rays import PolarizedRays
 from optiland.rays.ray_aiming import RayAimerFactory
 from optiland.rays.ray_cache import RayCache
@@ -36,7 +35,7 @@ def get_ray_starting_z_offset(optic, EPD=None):
     """
     z = optic.surface_group.positions[1:-1]
     offset = optic.paraxial.EPD() if EPD is None else EPD
-    return offset - np.min(z)
+    return offset - be.min(z)
 
 
 def get_ray_origins_finite(optic, field, pupil):
@@ -46,8 +45,8 @@ def get_ray_origins_finite(optic, field, pupil):
     Args:
         Hx (float): Normalized x field coordinate.
         Hy (float): Normalized y field coordinate.
-        Px (float or np.ndarray): x-coordinate of the pupil point.
-        Py (float or np.ndarray): y-coordinate of the pupil point.
+        Px (float or be.ndarray): x-coordinate of the pupil point.
+        Py (float or be.ndarray): y-coordinate of the pupil point.
         vx (float): Vignetting factor in the x-direction.
         vy (float): Vignetting factor in the y-direction.
 
@@ -65,9 +64,9 @@ def get_ray_origins_finite(optic, field, pupil):
     y = field_y
     z = obj.geometry.sag(x, y) + obj.geometry.cs.z
 
-    x0 = np.full_like(Px, x)
-    y0 = np.full_like(Px, y)
-    z0 = np.full_like(Px, z)
+    x0 = be.full_like(Px, x)
+    y0 = be.full_like(Px, y)
+    z0 = be.full_like(Px, z)
 
     return x0, y0, z0
 
@@ -97,13 +96,13 @@ def get_ray_origins_infinite(optic, field, pupil, vx, vy):
     offset = get_ray_starting_z_offset(optic, EPD)
 
     # x, y, z positions of ray starting points
-    x = np.tan(np.radians(field_x)) * (offset + EPL)
-    y = -np.tan(np.radians(field_y)) * (offset + EPL)
+    x = be.tan(be.radians(field_x)) * (offset + EPL)
+    y = -be.tan(be.radians(field_y)) * (offset + EPL)
     z = optic.surface_group.positions[1] - offset
 
     x0 = Px * EPD / 2 * vx + x
     y0 = Py * EPD / 2 * vy + y
-    z0 = np.full_like(Px, z)
+    z0 = be.full_like(Px, z)
 
     return x0, y0, z0
 
@@ -118,8 +117,8 @@ class FieldCalculator(ABC):
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate of the pupil point.
-            Py (float or np.ndarray): y-coordinate of the pupil point.
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
             wavelength (float): Wavelength of the rays.
 
         Returns:
@@ -128,7 +127,7 @@ class FieldCalculator(ABC):
         """
         self._validate()
 
-        vx, vy = 1 - np.array(self.optic.fields.get_vig_factor(Hx, Hy))
+        vx, vy = 1 - be.array(self.optic.fields.get_vig_factor(Hx, Hy))
         x0, y0, z0 = self._get_ray_origins(Hx, Hy, Px, Py, vx, vy)
 
         if self.optic.obj_space_telecentric:
@@ -137,15 +136,15 @@ class FieldCalculator(ABC):
             if ap_type == "objectNA":
                 sin = self.optic.aperture.value
             elif ap_type == "object_cone_angle":
-                sin = np.sin(np.radians(self.optic.aperture.value))
+                sin = be.sin(be.radians(self.optic.aperture.value))
             else:
                 raise ValueError(
                     f"Aperture type {ap_type} may not be used "
                     "with telecentric object space."
                 )
 
-            z = np.sqrt(1 - sin**2) / sin + z0
-            z1 = np.full_like(Px, z)
+            z = be.sqrt(1 - sin**2) / sin + z0
+            z1 = be.full_like(Px, z)
             x1 = Px * vx + x0
             y1 = Py * vy + y0
         else:
@@ -154,7 +153,7 @@ class FieldCalculator(ABC):
 
             x1 = Px * EPD * vx / 2
             y1 = Py * EPD * vy / 2
-            z1 = np.full_like(Px, EPL)
+            z1 = be.full_like(Px, EPL)
 
         return self._build_ray_instance(x0, y0, z0, x1, y1, z1, wavelength)
 
@@ -166,8 +165,8 @@ class FieldCalculator(ABC):
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate of the pupil point.
-            Py (float or np.ndarray): y-coordinate of the pupil point.
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
             vx (float): Vignetting factor in the x-direction.
             vy (float): Vignetting factor in the y-direction.
 
@@ -190,28 +189,28 @@ class FieldCalculator(ABC):
         starting and ending points, wavelength, and polarization setting.
 
         Args:
-            x0 (float or np.ndarray): x-coordinate of the starting point.
-            y0 (float or np.ndarray): y-coordinate of the starting point.
-            z0 (float or np.ndarray): z-coordinate of the starting point.
-            x1 (float or np.ndarray): x-coordinate of the ending point.
-            y1 (float or np.ndarray): y-coordinate of the ending point.
-            z1 (float or np.ndarray): z-coordinate of the ending point.
+            x0 (float or be.ndarray): x-coordinate of the starting point.
+            y0 (float or be.ndarray): y-coordinate of the starting point.
+            z0 (float or be.ndarray): z-coordinate of the starting point.
+            x1 (float or be.ndarray): x-coordinate of the ending point.
+            y1 (float or be.ndarray): y-coordinate of the ending point.
+            z1 (float or be.ndarray): z-coordinate of the ending point.
             wavelength (float): Wavelength of the rays.
 
         Returns:
             RealRays or PolarizedRays: The appropriate ray instance.
         """
-        mag = np.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
+        mag = be.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
         L = (x1 - x0) / mag
         M = (y1 - y0) / mag
         N = (z1 - z0) / mag
 
-        x0 = np.full_like(x1, x0)
-        y0 = np.full_like(x1, y0)
-        z0 = np.full_like(x1, z0)
+        x0 = be.full_like(x1, x0)
+        y0 = be.full_like(x1, y0)
+        z0 = be.full_like(x1, z0)
 
-        intensity = np.ones_like(x1)
-        wavelength = np.ones_like(x1) * wavelength
+        intensity = be.ones_like(x1)
+        wavelength = be.ones_like(x1) * wavelength
 
         if self.optic.polarization == "ignore":
             if self.optic.surface_group.uses_polarization:
@@ -235,8 +234,8 @@ class AngleFieldCalculator(FieldCalculator):
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate of the pupil point.
-            Py (float or np.ndarray): y-coordinate of the pupil point.
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
             vx (float): Vignetting factor in the x-direction.
             vy (float): Vignetting factor in the y-direction.
 
@@ -258,12 +257,12 @@ class AngleFieldCalculator(FieldCalculator):
         else:
             EPL = self.optic.paraxial.EPL()
             z = self.optic.surface_group.positions[0]
-            x = np.tan(np.radians(field_x)) * (EPL - z)
-            y = -np.tan(np.radians(field_y)) * (EPL - z)
+            x = be.tan(be.radians(field_x)) * (EPL - z)
+            y = -be.tan(be.radians(field_y)) * (EPL - z)
 
-            x0 = np.full_like(Px, x)
-            y0 = np.full_like(Px, y)
-            z0 = np.full_like(Px, z)
+            x0 = be.full_like(Px, x)
+            y0 = be.full_like(Px, y)
+            z0 = be.full_like(Px, z)
 
             return x0, y0, z0
 
@@ -285,8 +284,8 @@ class ObjectHeightFieldCalculator(FieldCalculator):
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate of the pupil point.
-            Py (float or np.ndarray): y-coordinate of the pupil point.
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
             vx (float): Vignetting factor in the x-direction.
             vy (float): Vignetting factor in the y-direction.
 
@@ -327,8 +326,8 @@ class ParaxialImageHeightFieldCalculator(FieldCalculator):
         Args:
             Hx (float): Normalized x field coordinate.
             Hy (float): Normalized y field coordinate.
-            Px (float or np.ndarray): x-coordinate of the pupil point.
-            Py (float or np.ndarray): y-coordinate of the pupil point.
+            Px (float or be.ndarray): x-coordinate of the pupil point.
+            Py (float or be.ndarray): y-coordinate of the pupil point.
             vx (float): Vignetting factor in the x-direction.
             vy (float): Vignetting factor in the y-direction.
 
@@ -337,8 +336,8 @@ class ParaxialImageHeightFieldCalculator(FieldCalculator):
                 object position.
         """
         y_img, H_img = self._generate_mapping()
-        Hx = np.interp(Hx, H_img, y_img)
-        Hy = np.interp(Hy, H_img, y_img)
+        Hx = be.interp(Hx, H_img, y_img)
+        Hy = be.interp(Hy, H_img, y_img)
 
         obj = self.optic.object_surface
 
@@ -354,12 +353,12 @@ class ParaxialImageHeightFieldCalculator(FieldCalculator):
         else:
             EPL = self.optic.paraxial.EPL()
             z = self.optic.surface_group.positions[0]
-            x = np.tan(np.radians(field_x)) * (EPL - z)
-            y = -np.tan(np.radians(field_y)) * (EPL - z)
+            x = be.tan(be.radians(field_x)) * (EPL - z)
+            y = -be.tan(be.radians(field_y)) * (EPL - z)
 
-            x0 = np.full_like(Px, x)
-            y0 = np.full_like(Px, y)
-            z0 = np.full_like(Px, z)
+            x0 = be.full_like(Px, x)
+            y0 = be.full_like(Px, y)
+            z0 = be.full_like(Px, z)
 
             return x0, y0, z0
 
@@ -375,8 +374,8 @@ class ParaxialImageHeightFieldCalculator(FieldCalculator):
                 coordinates
         """
         num = 32
-        Hy = np.linspace(0, 1, num)
-        Py = np.zeros(num)
+        Hy = be.linspace(0, 1, num)
+        Py = be.zeros(num)
         wavelength = self.optic.primary_wavelength
 
         rays = self.optic.paraxial.trace(Hy, Py, wavelength)
