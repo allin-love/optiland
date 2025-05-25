@@ -1,0 +1,461 @@
+{
+    "version": 1.0,
+    "aperture": {
+        "type": "imageFNO",
+        "value": 0.7,
+        "object_space_telecentric": false
+    },
+    "fields": {
+        "fields": [
+            {
+                "field_type": "angle",
+                "x": 0.0,
+                "y": 0,
+                "vx": 0.0,
+                "vy": 0.0
+            },
+            {
+                "field_type": "angle",
+                "x": 0.0,
+                "y": 2.8,
+                "vx": 0.0,
+                "vy": 0.0
+            },
+            {
+                "field_type": "angle",
+                "x": 0.0,
+                "y": 4,
+                "vx": 0.0,
+                "vy": 0.0
+            }
+        ],
+        "telecentric": false,
+        "field_type": "angle",
+        "object_space_telecentric": false
+    },
+    "wavelengths": {
+        "wavelengths": [
+            {
+                "value": 0.27,
+                "is_primary": true,
+                "unit": "um"
+            }
+        ],
+        "polarization": "ignore"
+    },
+    "pickups": [],
+    "solves": {
+        "solves": []
+    },
+    "surface_group": {
+        "surfaces": [
+            {
+                "type": "ObjectSurface",
+                "geometry": {
+                    "type": "Plane",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": -Infinity,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": Infinity
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                }
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 43.7642,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.498,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.889,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 73.820274,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.498,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 25.605739999999997,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 4.516882,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": true,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": true
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 12.91844,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 18.519902,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": {
+                    "type": "RadialAperture",
+                    "r_max": Infinity,
+                    "r_min": 3.8099999999999996
+                },
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": true
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 27.589479999999995,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 67.816984,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.461,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 28.674059999999994,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 12.310618,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.461,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 28.801059999999993,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 6.036817999999999,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.461,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 33.52799999999999,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 219.68307599999997,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.461,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 33.65499999999999,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 184.34253199999998,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.498,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "StandardGeometry",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 35.148519999999984,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": 11.28649,
+                    "conic": 0.0
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.498,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "Plane",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 37.10685999999998,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": Infinity
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.498,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            },
+            {
+                "type": "Surface",
+                "geometry": {
+                    "type": "Plane",
+                    "cs": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 37.287199999999984,
+                        "rx": 0.0,
+                        "ry": 0.0,
+                        "rz": 0.0,
+                        "reference_cs": null
+                    },
+                    "radius": Infinity
+                },
+                "material_pre": {
+                    "type": "IdealMaterial",
+                    "index": 1.498,
+                    "absorp": 0.0
+                },
+                "material_post": {
+                    "type": "IdealMaterial",
+                    "index": 1.0,
+                    "absorp": 0.0
+                },
+                "is_stop": false,
+                "aperture": null,
+                "coating": null,
+                "bsdf": null,
+                "is_reflective": false
+            }
+        ]
+    }
+}
